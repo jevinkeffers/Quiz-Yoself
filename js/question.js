@@ -1,13 +1,15 @@
 'use strict';
 
 const storedQuestions = JSON.parse(localStorage.getItem("questions"))
+const musicTime = JSON.parse(localStorage.getItem("musicTime"))
+const musicPause = JSON.parse(localStorage.getItem('paused'))
 const questionAsked = document.getElementById('question')
 let questionIterator = 0;
 const submitQsButton = document.getElementById('btnSubmit')
 const nextQsButton = document.getElementById('btnNext')
 const answerButtons = document.querySelectorAll('#btn')
 let answerSelected = false;
-
+console.log(musicPause)
 const updateCounter = () => {
     const counterDiv = document.getElementById('counter');
     const counterSpan = document.getElementById('counterSpan');
@@ -38,27 +40,47 @@ const updateButtons = () => {
     }
     setButtonVal()
 };
-
-
-
-
+const clickSound1= document.getElementById("click");
+function playClick() {
+    clickSound1.play();
+}
+const appSound2= document.getElementById("applause");
+function appPlay() {
+    appSound2.play();
+}
+function appStop() {
+    appSound2.pause();
+}
+const booSound2= document.getElementById("boos");
+function booPlay() {
+    booSound2.play();
+}
+function booStop() {
+    booSound2.pause();
+}
+const myMusic= document.getElementById("music");
 function play() {
-    const myMusic= document.getElementById("music");
     myMusic.play();
 }
 
 function pause() {
-    const myMusic= document.getElementById("music");
     myMusic.pause();
 }
 
+console.log(myMusic.autoplay)
+
+if(musicPause === 'play'){
+    myMusic.autoplay = true;
+    myMusic.load()
+    myMusic.play()
+    console.log(myMusic.autoplay)
+}
 
 document.addEventListener('DOMContentLoaded', ()=>{
     updateButtons();
     questionIterator = 1;
     nextQsButton.style.display = "none"
     updateCounter();
-    play()
 })
 
 nextQsButton.addEventListener('click', (e)=>{
@@ -68,24 +90,24 @@ nextQsButton.addEventListener('click', (e)=>{
         localStorage.setItem('answerArr', JSON.stringify(answerArr))
         correctCounter = 0
         answerArr =[]
-        window.location.replace('results.html')
+        playClick()
+        let nextPage = setTimeout(function(){window.location.replace('results.html')},1000)
     }
+    else{playClick()
     buttonNeutral();
     updateButtons();
     questionIterator++;
     updateCounter();
-    console.log(questionIterator)
-    console.log(answerArr)
-    console.log(storedQuestions)
     submitQsButton.style.display = "block"
     nextQsButton.style.display = "none"
-    answerSelected = false
+    answerSelected = false}
 });
 
 
 (function (){
     answerButtons.forEach(btn=>{
         btn.addEventListener('click', e=>{
+            playClick()
             const removeAll = () =>{
                 answerButtons.forEach(button =>{
                     button.classList.remove('selected')
@@ -102,7 +124,7 @@ let answerArr = [];
 let correctCounter = 0;
 submitQsButton.addEventListener('click', (e)=>{
     const resultDisplay = document.getElementById('result')
-    
+    playClick()
     if (!answerSelected){
         resultDisplay.classList.toggle('on')
         resultDisplay.innerHTML=('Please select an answer')
@@ -120,12 +142,12 @@ submitQsButton.addEventListener('click', (e)=>{
                     answerArr[questionIterator-1] = btn.innerHTML
                     if (answerArr[questionIterator-1] === storedQuestions[questionIterator-1].correct_answer){
                         resultDisplay.innerHTML = "CORRECT!!!"
-                        //resultDisplay.classList.toggle('correct')
+                        appPlay();
                         correctCounter += 1
                         }
                     else {
                         resultDisplay.innerHTML = "INCORRECT!!!"
-                        //resultDisplay.classList.toggle('incorrect')
+                        booPlay();
                     }
                 }
 
@@ -157,4 +179,6 @@ const buttonNeutral = () =>{
         btn.classList.remove('selected')
     })
     resultDisplay.classList.toggle('on')
+    appStop()
+    booStop()
 }
